@@ -21,83 +21,103 @@ app.get('/', async (req, reply) => {
   return reply.status(200).type('text/html').send(html)
 })
 
-app.get('/all-blogs', (request, reply) => __awaiter(this, void 0, void 0, function* () {
+app.get('/all-blogs', async (request, reply) => {
   try {
-      const result = yield server_1.pool.query('SELECT * FROM blogs');
+      const result = await pool.query('SELECT * FROM blogs');
       const blogs = result.rows;
       reply.send({ blogs });
-  }
-  catch (error) {
+  } catch (error) {
       console.error(error);
       reply.status(500).send({ message: 'Internal server error' });
   }
-}));
+});
 
-app.post('/add-blog', (request, reply) => __awaiter(this, void 0, void 0, function* () {
+app.post('/add-blog', async (request, reply) => {
   try {
-      const { title, shortDescription, description, imageUrl, category } = request.body;
-      // Assuming username is 'test' for now
-      const username = 'test';
-      yield server_1.pool.query('INSERT INTO blogs (title, shortDescription, description, imageUrl, category, username) VALUES ($1, $2, $3, $4, $5, $6)', [title, shortDescription, description, imageUrl, category, username]);
-      reply.send({ message: 'Blog posted successfully' });
-  }
-  catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: 'Internal server error' });
-  }
-}));
+    const { title, shortDescription, description, imageUrl, category } = request.body;
 
-app.delete('/delete-blog', (request, reply) => __awaiter(this, void 0, void 0, function* () {
-  try {
-      const blogid = request.headers['blogid'];
-      yield server_1.pool.query('DELETE FROM blogs WHERE blogid = $1', [blogid]);
-      reply.send({ message: 'Deleted successfully' });
-  }
-  catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: 'Internal server error' });
-  }
-}));
+    const username = 'test';
 
-app.get('/get-blog', (request, reply) => __awaiter(this, void 0, void 0, function* () {
-  try {
-      const id = request.headers['id'];
-      const result = yield server_1.pool.query('SELECT * FROM blogs WHERE blogid = $1', [id]);
-      const blogs = result.rows;
-      reply.send({ blogs });
-  }
-  catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: 'Internal server error' });
-  }
-}));
+    await pool.query(
+      'INSERT INTO blogs (title, short_description, description, image_url, category, username) VALUES ($1, $2, $3, $4, $5, $6)',
+      [title, shortDescription, description, imageUrl, category, username]
+    );
 
-app.get('/get-blogs', (request, reply) => __awaiter(this, void 0, void 0, function* () {
-  try {
-      const category = request.headers['category'];
-      const value = category ? category.charAt(0).toUpperCase() + category.slice(1) : undefined;
-      const result = yield server_1.pool.query('SELECT * FROM blogs WHERE category = $1', [value]);
-      const blogs = result.rows;
-      reply.send({ blogs });
+    reply.send({ message: 'Blog posted successfully' });
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({ message: 'Internal server error' });
   }
-  catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: 'Internal server error' });
-  }
-}));
+});
 
-app.put('/update-blog', (request, reply) => __awaiter(this, void 0, void 0, function* () {
+
+app.delete('/delete-blog', async (request, reply) => {
   try {
-      const data = request.body;
-      const { id, title, shortDescription, description, imageUrl, category } = data;
-      const result = yield server_1.pool.query('UPDATE blogs SET title = $1, shortdescription = $2, description = $3, imageurl = $4, category = $5 WHERE blogid = $6', [title, shortDescription, description, imageUrl, category, id]);
-      reply.send({ message: 'Blog updated successfully' });
+    const blogid = request.headers['blogid'];
+
+    await pool.query(
+      'DELETE FROM blogs WHERE blogid = $1',
+      [blogid]
+    );
+
+    reply.send({ message: 'Deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({ message: 'Internal server error' });
   }
-  catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: 'Internal server error' });
+});
+
+app.get('/get-blog', async (request, reply) => {
+  try {
+    const id = request.headers['id'];
+
+    const result = await pool.query(
+      'SELECT * FROM blogs WHERE blogid = $1',
+      [id]
+    );
+
+    const blogs = result.rows;
+    reply.send({ blogs });
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({ message: 'Internal server error' });
   }
-}));
+});
+
+app.get('/get-blogs', async (request, reply) => {
+  try {
+    const category = request.headers['category'];
+    const value = category ? category.charAt(0).toUpperCase() + category.slice(1) : undefined;
+
+    const result = await pool.query(
+      'SELECT * FROM blogs WHERE category = $1',
+      [value]
+    );
+
+    const blogs = result.rows;
+    reply.send({ blogs });
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({ message: 'Internal server error' });
+  }
+});
+
+app.put('/update-blog', async (request, reply) => {
+  try {
+    const data = request.body;
+    const { id, title, shortDescription, description, imageUrl, category } = data;
+
+    const result = await pool.query(
+      'UPDATE blogs SET title = $1, shortdescription = $2, description = $3, imageurl = $4, category = $5 WHERE blogid = $6',
+      [title, shortDescription, description, imageUrl, category, id]
+    );
+
+    reply.send({ message: 'Blog updated successfully' });
+  } catch (error) {
+    console.error(error);
+    reply.status(500).send({ message: 'Internal server error' });
+  }
+});
 
 export default async function handler(req, reply) {
   await app.ready()
