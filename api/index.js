@@ -34,13 +34,11 @@ app.get('/all-blogs', async (request, reply) => {
 
 app.post('/add-blog', async (request, reply) => {
   try {
-    const { title, shortDescription, description, imageUrl, category } = request.body;
-
-    const username = 'test';
+    const { title, shortDescription, description, imageUrl, category, username, publishtime} = request.body;
 
     await pool.query(
-      'INSERT INTO blogs (title, shortdescription, description, imageurl, category, username) VALUES ($1, $2, $3, $4, $5, $6)',
-      [title, shortDescription, description, imageUrl, category, username]
+      'INSERT INTO blogs (title, shortdescription, description, imageurl, category, username, publishtime) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      [title, shortDescription, description, imageUrl, category, username, publishtime]
     );
 
     reply.send({ message: 'Blog posted successfully' });
