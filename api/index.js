@@ -39,7 +39,7 @@ app.post('/add-blog', async (request, reply) => {
     const username = 'test';
 
     await pool.query(
-      'INSERT INTO blogs (title, short_description, description, image_url, category, username) VALUES ($1, $2, $3, $4, $5, $6)',
+      'INSERT INTO blogs (title, shortdescription, description, imageurl, category, username) VALUES ($1, $2, $3, $4, $5, $6)',
       [title, shortDescription, description, imageUrl, category, username]
     );
 
